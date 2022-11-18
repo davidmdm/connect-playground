@@ -3,10 +3,12 @@ package main
 import (
 	"context"
 	"fmt"
-	"log"
 	"net/http"
 
 	"github.com/bufbuild/connect-go"
+	"github.com/circleci/backplane-go/environment"
+	"github.com/circleci/samwise/observability"
+	"github.com/gin-gonic/gin"
 	"golang.org/x/net/http2"
 	"golang.org/x/net/http2/h2c"
 
@@ -17,7 +19,6 @@ import (
 type GreetServer struct{}
 
 func (s *GreetServer) Greet(ctx context.Context, req *connect.Request[greetv1.GreetRequest]) (*connect.Response[greetv1.GreetResponse], error) {
-	log.Println("Request headers: ", req.Header())
 	res := connect.NewResponse(&greetv1.GreetResponse{
 		Greeting: fmt.Sprintf("Hello, %s!", req.Msg.Name),
 	})
@@ -27,23 +28,21 @@ func (s *GreetServer) Greet(ctx context.Context, req *connect.Request[greetv1.Gr
 }
 
 func main() {
+	ctx, teardown := observability.MustReportingContext(context.Background(), environment.FromOS())
+	defer teardown(ctx)
+
 	greeter := &GreetServer{}
 
-	mux := http.NewServeMux()
+	gin.SetMode(gin.ReleaseMode)
+	engine := gin.New()
 
-	path, handler := greetv1connect.NewGreetServiceHandler(greeter)
-	mux.Handle(path, WrapperMiddleware(handler))
+	engine.Use(observability.Middlewares(observability.FromContext(ctx))...)
 
-	// Use h2c so we can serve HTTP/2 without TLS.
-	http.ListenAndServe(":8080", h2c.NewHandler(mux, &http2.Server{}))
+	engine.Any(GinAdaptor(greetv1connect.NewGreetServiceHandler(greeter)))
+
+	http.ListenAndServe(":8080", h2c.NewHandler(engine, &http2.Server{}))
 }
 
-type RWWrapper struct {
-	http.ResponseWriter
-}
-
-func WrapperMiddleware(h http.Handler) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		h.ServeHTTP(RWWrapper{w}, r)
-	})
+func GinAdaptor(path string, h http.Handler) (string, gin.HandlerFunc) {
+	return path + "*rest", func(c *gin.Context) { h.ServeHTTP(c.Writer, c.Request) }
 }
