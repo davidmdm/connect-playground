@@ -2,26 +2,31 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"log"
 	"net/http"
 
-	greetv1 "github.com/davidmdm/connect-playground/internal/proto/greet/v1"
-	"github.com/davidmdm/connect-playground/internal/proto/greet/v1/greetv1connect"
+	signerv1 "github.com/davidmdm/connect-playground/internal/proto/signer/v1"
+	"github.com/davidmdm/connect-playground/internal/proto/signer/v1/signerv1connect"
 
 	"github.com/bufbuild/connect-go"
 )
 
 func main() {
-	client := greetv1connect.NewGreetServiceClient(
+	client := signerv1connect.NewSignerServiceClient(
 		http.DefaultClient,
 		"http://localhost:8080",
 		connect.WithGRPC(),
 	)
 
-	res, err := client.Greet(context.Background(), connect.NewRequest(&greetv1.GreetRequest{Name: "Jane"}))
+	res, err := client.Sign(context.Background(), connect.NewRequest(&signerv1.SignRequest{
+		OrgId:    "org_uuid",
+		Subject:  "me-mario",
+		Audience: []string{"ecr"},
+	}))
 	if err != nil {
 		log.Println(err)
 		return
 	}
-	log.Println(res.Msg.Greeting)
+	fmt.Println(res.Msg.Token)
 }
