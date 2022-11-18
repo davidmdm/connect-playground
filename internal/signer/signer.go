@@ -37,12 +37,11 @@ func (svc Service) Sign(ctx context.Context, req *connect.Request[signerv1.SignR
 		IssuedAt(now).
 		Expiration(now.Add(time.Hour)).
 		Build()
-
-	tkn.Options().Enable(jwt.FlattenAudience)
-
 	if err != nil {
 		return nil, err
 	}
+
+	tkn.Options().Enable(jwt.FlattenAudience)
 
 	signed, err := jwt.Sign(tkn, jwt.WithKey(jwa.RS256, svc.key))
 	if err != nil {
