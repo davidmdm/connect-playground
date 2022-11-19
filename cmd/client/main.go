@@ -6,6 +6,7 @@ import (
 	"net/http"
 
 	signerv1 "github.com/davidmdm/connect-playground/internal/proto/signer/v1"
+	"google.golang.org/protobuf/types/known/structpb"
 
 	signer "github.com/davidmdm/connect-playground/pkgs/clients/go"
 
@@ -15,10 +16,19 @@ import (
 func main() {
 	client := signer.NewClient(http.DefaultClient, "http://localhost:8080")
 
+	customClaims, err := structpb.NewStruct(map[string]any{
+		"project_id":  23,
+		"context_ids": []any{"org-readonly", "github-readonly"},
+	})
+	if err != nil {
+		panic(err)
+	}
+
 	res, err := client.Sign(context.Background(), connect.NewRequest(&signerv1.SignRequest{
-		OrgId:    "org_uuid",
-		Subject:  "me-mario",
-		Audience: []string{"ecr"},
+		OrgId:        "org_uuid",
+		Subject:      "me-mario",
+		Audience:     []string{"ecr"},
+		CustomClaims: customClaims,
 	}))
 	if err != nil {
 		panic(err)

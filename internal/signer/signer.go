@@ -29,14 +29,19 @@ func MakeService(key jwk.Key) Service {
 func (svc Service) Sign(ctx context.Context, req *connect.Request[signerv1.SignRequest]) (*connect.Response[signerv1.SignResponse], error) {
 	now := time.Now()
 
-	tkn, err := jwt.
+	builder := jwt.
 		NewBuilder().
 		Subject(req.Msg.Subject).
 		Audience(req.Msg.Audience).
 		Issuer("https://issuer/org/" + req.Msg.OrgId).
 		IssuedAt(now).
-		Expiration(now.Add(time.Hour)).
-		Build()
+		Expiration(now.Add(time.Hour))
+
+	for k, v := range req.Msg.CustomClaims.AsMap() {
+		builder.Claim("oidc.circleci.com/"+k, v)
+	}
+
+	tkn, err := builder.Build()
 	if err != nil {
 		return nil, err
 	}

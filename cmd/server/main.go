@@ -44,10 +44,7 @@ func main() {
 
 	handler := ServerHandler(ctx, signer.MakeService(key), set)
 
-	http.ListenAndServe(
-		":8080",
-		h2c.NewHandler(handler, &http2.Server{}),
-	)
+	http.ListenAndServe(":8080", h2c.NewHandler(handler, &http2.Server{}))
 }
 
 func ServerHandler(ctx context.Context, svc signer.Service, jwkSet jwk.Set) http.Handler {
