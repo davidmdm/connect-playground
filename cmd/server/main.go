@@ -22,27 +22,12 @@ func main() {
 	ctx, teardown := observability.MustReportingContext(context.Background(), environment.FromOS())
 	defer teardown(ctx)
 
-	rsaKey, err := rsa.GenerateKey(rand.Reader, 2048)
-	if err != nil {
-		panic(err)
-	}
-
-	key, err := jwk.FromRaw(rsaKey)
-	if err != nil {
-		panic(err)
-	}
-	key.Set("alg", "RS256")
-	key.Set("kid", "test")
-
-	pubKey, err := key.PublicKey()
-	if err != nil {
-		panic(err)
-	}
+	privKey, pubKey := MustGenerateKeyPair()
 
 	set := jwk.NewSet()
 	set.AddKey(pubKey)
 
-	handler := ServerHandler(ctx, signer.MakeService(key), set)
+	handler := ServerHandler(ctx, signer.MakeService(privKey), set)
 
 	http.ListenAndServe(":8080", h2c.NewHandler(handler, &http2.Server{}))
 }
@@ -62,4 +47,24 @@ func ServerHandler(ctx context.Context, svc signer.Service, jwkSet jwk.Set) http
 
 func GinAdaptor(path string, h http.Handler) (string, gin.HandlerFunc) {
 	return path + "*rest", func(c *gin.Context) { h.ServeHTTP(c.Writer, c.Request) }
+}
+
+func MustGenerateKeyPair() (priv, pub jwk.Key) {
+	rsaKey, err := rsa.GenerateKey(rand.Reader, 2048)
+	if err != nil {
+		panic(err)
+	}
+
+	priv, err = jwk.FromRaw(rsaKey)
+	if err != nil {
+		panic(err)
+	}
+	priv.Set("alg", "RS256")
+	priv.Set("kid", "test")
+
+	pub, err = priv.PublicKey()
+	if err != nil {
+		panic(err)
+	}
+	return
 }
