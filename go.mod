@@ -6,7 +6,7 @@ require (
 	github.com/bufbuild/connect-go v1.1.0
 	github.com/circleci/backplane-go v0.16.2988
 	github.com/circleci/samwise v0.0.1-630
-	github.com/davidmdm/muxter v0.7.2
+	github.com/davidmdm/muxter v0.8.0
 	github.com/gin-gonic/gin v1.8.1
 	github.com/lestrrat-go/jwx/v2 v2.0.7
 	golang.org/x/net v0.2.0

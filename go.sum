@@ -70,6 +70,8 @@ github.com/davidmdm/muxter v0.7.1 h1:BIFXcevHLSG0fco20/egtPS1PgyS3awUDT+3GpGrqeE
 github.com/davidmdm/muxter v0.7.1/go.mod h1:6f4EQiP55pJ3EG+aZQ8QH8t5gKxojTOrZfWyK20M2zw=
 github.com/davidmdm/muxter v0.7.2 h1:uRBed5jWfTC5OXkEWcXR2SdKjQiDD93V/XdvupVMM7A=
 github.com/davidmdm/muxter v0.7.2/go.mod h1:6f4EQiP55pJ3EG+aZQ8QH8t5gKxojTOrZfWyK20M2zw=
+github.com/davidmdm/muxter v0.8.0 h1:xqGixrdBZ8XhEYJAv7zDKrI69Ax/ykwmjXcfjTNBcfY=
+github.com/davidmdm/muxter v0.8.0/go.mod h1:6f4EQiP55pJ3EG+aZQ8QH8t5gKxojTOrZfWyK20M2zw=
 github.com/decred/dcrd/crypto/blake256 v1.0.0/go.mod h1:sQl2p6Y26YV+ZOcSTP6thNdn47hh8kt6rqSlvmrXFAc=
 github.com/decred/dcrd/dcrec/secp256k1/v4 v4.1.0 h1:HbphB4TFFXpv7MNrT52FGrrgVXF1owhMVTHFZIlnvd4=
 github.com/decred/dcrd/dcrec/secp256k1/v4 v4.1.0/go.mod h1:DZGJHZMqrU4JJqFAWUS2UO1+lbSKsdiOoYi9Zzey7Fc=
