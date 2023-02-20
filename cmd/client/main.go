@@ -24,12 +24,14 @@ func main() {
 		panic(err)
 	}
 
-	res, err := client.Sign(context.Background(), connect.NewRequest(&signerv1.SignRequest{
+	request := connect.NewRequest(&signerv1.SignRequest{
 		OrgId:        "org_uuid",
 		Subject:      "me-mario",
-		Audience:     []string{"ecr"},
+		Audience:     []string{"ECR"},
 		CustomClaims: customClaims,
-	}))
+	})
+
+	res, err := client.Sign(context.Background(), request)
 	if err != nil {
 		panic(err)
 	}
