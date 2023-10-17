@@ -1,0 +1,28 @@
+version: "3"
+
+tasks:
+  coverage:
+    cmds:
+      - rm -rf ./coverage && mkdir -p coverage/{service,acceptance,merged}
+      - go test -p 1 -count 1 ./... -cover -coverpkg=./... -args -test.gocoverdir=$PWD/coverage/service
+      - go tool covdata merge -i ./coverage/acceptance,./coverage/service -o ./coverage/merged
+      - go tool covdata percent -i=./coverage/merged
+      - go tool covdata textfmt -i ./coverage/merged -o ./coverage/cov.out
+      - '{{if eq .CLI_ARGS "html"}} go tool cover -html ./coverage/cov.out{{end}}'
+
+  lint:
+    cmds:
+      - golangci-lint run ./...
+
+  generate:
+    cmds:
+      - go generate ./...
+
+  # Ironically the task runner is itself a dev dependency of the project.
+  # To install it run the following command:
+  #
+  # go install github.com/go-task/task/v3/cmd/task@latest
+  install-dev-deps:
+    cmds:
+      - go install google.golang.org/protobuf/cmd/protoc-gen-go@latest
+      - go install github.com/bufbuild/buf/cmd/buf@latest

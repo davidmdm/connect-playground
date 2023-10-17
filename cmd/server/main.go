@@ -6,7 +6,7 @@ import (
 	"net/http"
 	"os"
 
-	"github.com/bufbuild/connect-go"
+	"connectrpc.com/connect"
 	"golang.org/x/net/http2"
 	"golang.org/x/net/http2/h2c"
 
@@ -15,9 +15,13 @@ import (
 	"github.com/davidmdm/muxter"
 )
 
-type GreetServer struct{}
+type GreetServer struct {
+	greetv1connect.UnimplementedGreetServiceHandler
+}
 
-func (s *GreetServer) Greet(ctx context.Context, req *connect.Request[greetv1.GreetRequest]) (*connect.Response[greetv1.GreetResponse], error) {
+var _ greetv1connect.GreetServiceHandler = GreetServer{}
+
+func (s GreetServer) Greet(ctx context.Context, req *connect.Request[greetv1.GreetRequest]) (*connect.Response[greetv1.GreetResponse], error) {
 	res := connect.NewResponse(&greetv1.GreetResponse{
 		Greeting: fmt.Sprintf("Hello, %s!", req.Msg.Name),
 	})

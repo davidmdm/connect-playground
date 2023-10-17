@@ -5,10 +5,9 @@ import (
 	"log"
 	"net/http"
 
+	"connectrpc.com/connect"
 	greetv1 "github.com/davidmdm/connect-playground/internal/proto/greet/v1"
 	"github.com/davidmdm/connect-playground/internal/proto/greet/v1/greetv1connect"
-
-	"github.com/bufbuild/connect-go"
 )
 
 func main() {
